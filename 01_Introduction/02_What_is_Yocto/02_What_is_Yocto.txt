@@ -1,0 +1,26 @@
+What is Yocto?
+--------------
+
+Yocto is  the smallest SI metric system prefix
+Like 'm' stands for mili (10^-3)
+So is yocto ( y = 10^-24 )
+
+
+What is Yocto Project?
+----------------------
+Yocto project provides open source, high quality infrastructure and tools to
+help developers create their own custom Linux distribution for any hardware
+architecture.
+
+
+History
+-------
+Founded in 2010, in an effort to reduce work duplication, provide resources and
+information catering to both new and experienced users.
+
+Collaboration of
+    many hardware manufacturers
+    open source operating systems vendors
+    electronic companies
+
+Yocto is also a project working group of the Linux Foundation.

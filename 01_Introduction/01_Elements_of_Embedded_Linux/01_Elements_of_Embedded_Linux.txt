@@ -1,0 +1,21 @@
+Four elements of Embedded Linux
+--------------------------------
+
+Toolchain :
+The "Compiler" and "other tools" needed to create code for your target device.
+Everything else depends on the toolchain.
+
+Bootloader:
+The "Program" that initializes the board and loads the Linux Kernel.
+
+Kernel:
+This is the "heart of the system". Managing system resources and interfacing with
+hardware.
+
+Root File System:
+"Contains the libraries and programs" that are run once the kernel has completed
+its initialization.
+
+One more element can be collection of programs specific to your embedded
+application which make the device do whatever it is supposed to do, be it weigh
+groceries, display movies, control a robot or fly a drone.
