@@ -9,4 +9,4 @@ Input :
 Output:
 
   Linux Based Embedded Product
-  (Linux Kernel, Root File System, Bootloader, Device Tree)
+  (Linux Kernel, Root File System, Bootloader, Device Tree, Toolchain)
