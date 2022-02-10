@@ -1,0 +1,17 @@
+What is MetaData?
+-----------------
+
+Non Yocto: A set of data that describes and gives information about other data.
+
+Yocto World:
+    -Metadata refers to the build instructions
+    -Commands and data used to indicate what versions of software are used
+    -Where they are obtained from
+    -Changes of additions to the software itself ( pacthes ) which are used to fix
+     bugs or customize the software for use in a particular situation
+
+Metadata is collection of
+    - Configuration files (.conf)
+    - Recipes (.bb and .bbappend)
+    - Classes (.bbclass)
+    - Includes (.inc)
