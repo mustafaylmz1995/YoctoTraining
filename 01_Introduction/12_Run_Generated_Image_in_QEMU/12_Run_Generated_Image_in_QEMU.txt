@@ -1,0 +1,23 @@
+Command to run the generated image in QEMU
+------------------------------------------
+
+Quick Emulator (QEMU) is a free and open software package that performs hardware
+virtualization.
+The QEMU based machines allow test and development without real hardware.
+
+Currently emulations are supported for:
+  -ARM
+  -MIPS
+  -MIPS64
+  -PowerPC
+  -X86
+  -X86_64
+
+Poky provides a script 'runqemu' which will allow you to start the QEMU using
+yocto generated images.
+
+The runqemu script is run as:
+  runqemu <machine> <zimage> <filesystem>
+where:
+  <machine> is the machine/architecture to use
+  (qemuarm/qemuips/qemuppc/qemux86/qemux86-64)

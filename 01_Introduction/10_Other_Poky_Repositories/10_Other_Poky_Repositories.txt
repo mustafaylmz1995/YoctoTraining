@@ -14,4 +14,4 @@ Poky includes
   bitbake
   demo-BSP's
   helper scripts to setup environment
-  emulator QRMU to test the Image
+  emulator QEMU to test the Image
