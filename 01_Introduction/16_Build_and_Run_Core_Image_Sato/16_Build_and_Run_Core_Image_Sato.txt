@@ -1,0 +1,7 @@
+core-image-sato
+---------------
+
+This is the X11 Windows-system-based image with a SATO theme and GNOME mobile
+desktop environment.
+
+$ bitbake core-image-sato

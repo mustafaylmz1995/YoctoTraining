@@ -21,3 +21,18 @@ The runqemu script is run as:
 where:
   <machine> is the machine/architecture to use
   (qemuarm/qemuips/qemuppc/qemux86/qemux86-64)
+  <zimage> is the machine/architecture to use
+  (qemuarm/qemuips/qemuppc/qemux86/qemux86-64)
+  <filesystem> is the path to an ext2 image (e.g. filesystem-qemuarm.ext2) or
+  an nfs directory
+
+Full usage instructions can be seen by running the command with no options
+specified.
+
+EXIT QEMU
+---------
+
+Exit QEMU by either clicking on the shutdown icon or by typing Ctrl-C in the
+QEMU transcript window from which you evoked QEMU.
+
+We can write poweroff in terminal to close. 
