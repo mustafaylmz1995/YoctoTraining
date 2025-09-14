@@ -1,0 +1,212 @@
+
+1.
+sudo apt-get install gawk wget git git-core diffstat unzip texinfo gcc gcc-multilib build-essential chrpath cpio make python python3 python3-pip python3-pexpect python3-git python3-jinja2 python3-subunit pylint3 xz-utils socat libsdl1.2-dev xterm ncurses-dev lzop minicom u-boot-tools curl debianutils iputils-ping libegl1-mesa mesa-common-dev zstd liblz4-tool
+
+sudo pip3 install sphinx sphinx_rtd_theme pyyaml
+
+2.
+mkdir ~/bin
+curl http://commondatastorage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+chmod a+x ~/bin/repo
+export PATH=$PATH:~/bin
+
+
+3.
+mkdir -p ~/raspberryPi3/sources
+cd ~/raspberryPi3/sources
+3.a
+git clone -b dunfell git://git.yoctoproject.org/poky 
+git clone -b dunfell git://git.openembedded.org/meta-openembedded
+git clone -b dunfell git://git.yoctoproject.org/meta-raspberrypi
+
+or 3.b
+git clone -b krogoth git://git.yoctoproject.org/poky
+git clone -b krogoth git://git.openembedded.org/meta-openembedded
+git clone -b krogoth git://git.yoctoproject.org/meta-raspberrypi
+
+mkdir ~/raspberryPi3/sources/poky/meta/recipes-core/init-ifupdown/init-ifupdown-
+1.0/raspberrypi3
+cd ~/raspberryPi3/sources/poky/meta/recipes-core/init-ifupdown/init-ifupdown-
+1.0/raspberrypi3
+touch interfaces
+
+fill with followings the interfaces file
+# /etc/network/interfaces -- configuration file for ifup(8), ifdown(8)
+
+# The loopback interface
+auto lo
+iface lo inet loopback
+
+# Wireless interfaces
+iface wlan0 inet dhcp
+	wireless_mode managed
+	wireless_essid any
+	wpa-driver wext
+	wpa-conf /etc/wpa_supplicant.conf
+
+iface atml0 inet dhcp
+
+# Wired or wireless interfaces
+auto eth0
+iface eth0 inet static
+	address 192.168.1.2
+	netmask 255.255.255.0
+	gateway 192.168.1.1
+	network 192.168.1.0
+
+
+# Ethernet/RNDIS gadget (g_ether)
+# ... or on host side, usbnet and random hwaddr
+iface usb0 inet static
+	address 192.168.7.2
+	netmask 255.255.255.0
+	network 192.168.7.0
+	gateway 192.168.7.1
+	
+# Bluetooth networking
+iface bnep0 inet dhcp
+
+4.
+cd ~/raspberryPi3/
+source sources/poky/oe-init-build-env rpi-build
+
+4.a
+bitbake-layers add-layer ../sources/meta-openembedded/meta-oe
+bitbake-layers add-layer ../sources/meta-openembedded/meta-python
+bitbake-layers add-layer ../sources/meta-openembedded/meta-multimedia
+bitbake-layers add-layer ../sources/meta-openembedded/meta-networking
+bitbake-layers add-layer ../sources/meta-raspberrypi
+bitbake-layers show-layers
+
+5.a
+# ===== Donanım Ayarı =====
+MACHINE ?= "raspberrypi3-64"
+
+# ===== İndirme ve Önbellek Klasörleri =====
+DL_DIR ?= "${HOME}/yocto-downloads"
+SSTATE_DIR ?= "${HOME}/yocto-sstate-cache"
+
+# ===== Build Hızlandırıcılar ve Hata Çözümleri =====
+# Hazır derlenmiş paketleri indirerek build'i hızlandırır
+SSTATE_MIRRORS ?= "file://.* http://sstate.yoctoproject.org/3.1.15/PATH;downloadfilename=PATH \n "
+
+# İnternet'teki bozuk veya eski linklere karşı ayna sunucu kullanır
+PREMIRRORS_prepend = " \
+git://.*/.* http://sources.openembedded.org/sources/ \n \
+ftp://.*/.* http://sources.openembedded.org/sources/ \n \
+http://.*/.* http://sources.openembedded.org/sources/ \n \
+https://.*/.* http://sources.openembedded.org/sources/ \n \
+"
+
+# ===== İmaj İçine Eklenecek Ekstra Özellikler =====
+# SSH sunucusu (dropbear) ekler
+EXTRA_IMAGE_FEATURES_append = " ssh-server-dropbear"
+# Nano metin editörünü ekler
+CORE_IMAGE_EXTRA_INSTALL_append = " nano"
+# Seri Port (UART) Konsolunu Aktif Et
+ENABLE_UART = "1"
+
+5.b
+if you follows b branch then you need to make after run 4. step 
+remove existing content in "rpi-build/conf/local.conf” then paste followings
+
+MACHINE ?= "raspberrypi3"
+PREFERRED_VERSION_linux-raspberrypi = "4.%"
+DISTRO_FEATURES_remove = "x11 wayland"
+DISTRO_FEATURES_append = " systemd"
+VIRTUAL-RUNTIME_init_manager = "systemd"
+ENABLE_UART = "1"
+
+remove existing content in "rpi-build/conf/bblayers.conf” then paste followings
+ensure it is formatted exactly as shown, spaces and missing indents can cause parse errors
+
+LCONF_VERSION = "6"
+
+BBPATH = "${TOPDIR}"
+BSPDIR := "${@os.path.abspath(os.path.dirname(d.getVar('FILE', True)) + '/../..')}"
+
+BBFILES ?= ""
+BBLAYERS ?= " \
+  ${BSPDIR}/sources/poky/meta \
+  ${BSPDIR}/sources/poky/meta-yocto \
+  ${BSPDIR}/sources/poky/meta-yocto-bsp \
+  ${BSPDIR}/sources/meta-openembedded/meta-oe \
+  ${BSPDIR}/sources/meta-openembedded/meta-multimedia \
+  ${BSPDIR}/sources/meta-raspberrypi \
+  "
+
+
+6.a
+bitbake core-image-base -n
+bitbake core-image-base --runonly=fetch
+bitbake core-image-base
+
+for graphical interface
+bitbake core-image-sato-dev -n
+bitbake core-image-sato-dev --runonly=fetch
+bitbake core-image-sato-dev
+
+suggested: bitbake core-image-base
+
+6.b
+bitbake rpi-basic-image
+
+7. if it happens
+Adım (Sorun Giderme): bmap-tools Tarifini Yamama
+dunfell sürümünde bmap-tools adında bir paketin tarifi bozuktur ve build işleminin hata vermesine neden olur. Bu adımı uygulayarak bu tarifi düzelteceğiz.
+
+Özel Yama Katmanı ve .bbappend Dosyası Oluşturun: Aşağıdaki komutları rpi-build klasöründeyken sırasıyla çalıştırın.
+
+
+# 1. Gerekli klasörleri oluştur
+mkdir -p ../sources/meta-my-fixes/conf
+mkdir -p ../sources/meta-my-fixes/recipes-support/bmap-tools
+
+# 2. Katman yapılandırma dosyasını oluştur
+cat <<EOT > ../sources/meta-my-fixes/conf/layer.conf
+BBPATH .= ":\${LAYERDIR}"
+BBFILES += "\${LAYERDIR}/recipes-*/*/*.bb \${LAYERDIR}/recipes-*/*/*.bbappend"
+BBFILE_COLLECTIONS += "meta-my-fixes"
+BBFILE_PATTERN_meta-my-fixes = "^\\\${LAYERDIR}/"
+BBFILE_PRIORITY_meta-my-fixes = "15"
+EOT
+
+# 3. Yeni katmanı projeye ekle
+bitbake-layers add-layer ../sources/meta-my-fixes
+
+# 4. Bozuk tarifi düzeltecek olan .bbappend dosyasını oluştur
+cat <<EOT > ../sources/meta-my-fixes/recipes-support/bmap-tools/bmap-tools_3.5.bbappend
+PV = "3.5"
+SRCREV = ""
+SRC_URI = "https://github.com/intel/bmap-tools/archive/v\${PV}.tar.gz"
+SRC_URI[sha256sum] = "d410e2d97192d0fc2f88ef160a0bb6ed83fce99da97a606d7f6890cc654ec594"
+S = "\${WORKDIR}/\${BPN}-\${PV}"
+EOT
+
+
+8.
+sudo fdisk -l
+##??##sudo umount /dev/sdc*
+
+9.
+cd tmp/deploy/images/raspberrypi3-64
+bzip2 -d -f core-image-sato-dev-raspberrypi3-64.wic.bz2
+veya
+bzip2 -d core-image-base-raspberrypi3-64.wic.bz2
+	 core-image-base-raspberrypi3-64.wic.bz2
+sudo dd bs=4M if=core-image-sato-dev-raspberrypi3-64.wic of=/dev/sdc status=progress conv=fsync
+# Örneğin kart /dev/sdc ise:
+sudo dd bs=4M if=core-image-base-raspberrypi3-64.wic of=/dev/sdc status=progress conv=fsync
+
+sudo dd bs=4M if=core-image-base-raspberrypi3-64.wic of=/dev/sdb status=progress conv=fsync
+
+10.
+Open rasberrypi3 b+
+root for username and empty password
+
+11.
+ip a 
+wpa_passphrase "<SSID>" "<Password> >>/etc/wpa_supplicant.conf
+ifup wlan0
+ifconfig wlan0
+
